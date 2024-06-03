@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Random Birth Location</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.css"/>
+  <style>
+    #map {
+      height: 50vh;
+    }
+    .leaflet-container {
+      background: #f7fafc;
+    }
+  </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+  <div class="w-full max-w-4xl bg-white p-8 rounded-lg shadow-lg">
+    <h1 class="text-2xl font-bold mb-4 text-center">投胎生成器</h1>
+    <div id="map" class="mb-4"></div>
+    <button id="randomize" class="w-full bg-blue-500 text-white p-2 rounded mb-4">投胎</button>
+    <table class="w-full text-left border-collapse">
+      <thead>
+        <tr>
+          <th class="border-b-2 p-2">投胎次数</th>
+          <th class="border-b-2 p-2">投胎国家</th>
+          <th class="border-b-2 p-2">投胎地区/省/州</th>
+          <th class="border-b-2 p-2">投胎职业</th>
+          <th class="border-b-2 p-2">存活年龄</th>
+        </tr>
+      </thead>
+      <tbody id="results">
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    const map = L.map('map').setView([20, 0], 2);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+    }).addTo(map);
+
+    const countries = {
+      "China": { regions: ["Beijing", "Shanghai", "Guangdong", "Sichuan"], coords: [35.8617, 104.1954] },
+      "United States": { regions: ["California", "Texas", "Florida", "New York"], coords: [37.0902, -95.7129] },
+      "India": { regions: ["Maharashtra", "Tamil Nadu", "West Bengal", "Rajasthan"], coords: [20.5937, 78.9629] },
+      "Brazil": { regions: ["São Paulo", "Rio de Janeiro", "Bahia", "Paraná"], coords: [-14.2350, -51.9253] },
+      "Russia": { regions: ["Moscow", "Saint Petersburg", "Siberia", "Urals"], coords: [61.5240, 105.3188] }
+    };
+
+    const professions = ["Farmer", "Engineer", "Teacher", "Doctor", "Artist", "Scientist"];
+    const ages = [60, 70, 80, 90, 100];
+
+    let counter = 0;
+
+    document.getElementById('randomize').addEventListener('click', () => {
+      const countryNames = Object.keys(countries);
+      const country = countryNames[Math.floor(Math.random() * countryNames.length)];
+      const region = countries[country].regions[Math.floor(Math.random() * countries[country].regions.length)];
+      const profession = professions[Math.floor(Math.random() * professions.length)];
+      const age = ages[Math.floor(Math.random() * ages.length)];
+
+      const latLng = [
+        countries[country].coords[0] + (Math.random() - 0.5) * 10,
+        countries[country].coords[1] + (Math.random() - 0.5) * 10
+      ];
+
+      L.marker(latLng).addTo(map)
+        .bindPopup(`<b>${country}</b><br>${region}`)
+        .openPopup();
+
+      counter++;
+      const resultsTable = document.getElementById('results');
+      const newRow = resultsTable.insertRow();
+      newRow.insertCell(0).innerText = counter;
+      newRow.insertCell(1).innerText = country;
+      newRow.insertCell(2).innerText = region;
+      newRow.insertCell(3).innerText = profession;
+      newRow.insertCell(4).innerText = age;
+    });
+  </script>
+</body>
+</html>
